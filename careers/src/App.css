@@ -1,0 +1,60 @@
+.App {
+  /* background-color: green; */
+  width : 98.5vw;
+  font-family: 'Arial', sans-serif;
+}
+
+.App-header {
+  background-color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box; /* Ensures padding is included in the width calculation */
+}
+
+.logo {
+  width: 150px;
+}
+
+nav a {
+  margin: 0 15px;
+  text-decoration: none;
+  color: #000;
+  font-weight: bold;
+}
+
+nav a:hover {
+  color: #FF6600;
+}
+/* .banner-container {
+  width: 100%;
+  height: 300px; 
+  overflow: hidden;
+  position: relative;
+} */
+
+.banner {
+  width: 98vw;
+  height: 300px;
+  /* position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); */
+  /* object-fit: cover; */
+  object-fit: cover;
+}
+.footer-container{
+  position: relative; /* Ensure the container can position its children absolutely */
+  background-color: #000;
+}
+
+.footer-image {
+  width: 98.75vw;
+  height: 700px;
+  object-fit: cover;
+  overflow: hidden;
+  position: absolute;
+  bottom: -200px; /* Align the image to the top of the container */
+  left: 0;
+  z-index: -1; /* Send the image backwards */
+}
