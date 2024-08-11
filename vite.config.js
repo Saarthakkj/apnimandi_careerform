@@ -14,7 +14,7 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
-      external: ['zod'], // Add this line to externalize the `zod` module
+      external: 'zod', // Add this line to externalize the `zod` module
     }
   }
 })
