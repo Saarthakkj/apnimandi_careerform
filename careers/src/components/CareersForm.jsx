@@ -1,5 +1,16 @@
 import React, { useState } from "react";
+import { z } from "zod";
+import axios from "axios";
 import "./CareersForm.css";
+
+// Define the Zod schema
+const FormSchema = z.object({
+  firstName: z.string().min(1, "First Name is required"),
+  lastName: z.string().min(1, "Last Name is required"),
+  phoneNumber: z.string().min(1, "Phone Number is required"),
+  email: z.string().email("Invalid email address"),
+  url: z.string().url("Invalid URL").optional().or(z.literal("")),
+});
 
 function CareersForm() {
   const [formData, setFormData] = useState({
@@ -10,18 +21,96 @@ function CareersForm() {
     url: "",
   });
 
+  const [resume, setResume] = useState(null);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState(null);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
+    setSubmitted(false);
+  };
+
+  const handleFileChange = (e) => {
+    setResume(e.target.files[0]);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const response = FormSchema.safeParse(formData);
+
+    if (!response.success) {
+      setError(response.error.errors);
+    } else {
+      console.log("Form is submitted!");
+      setError(null);
+      setSubmitted(true);
+
+      const formDataToSend = new FormData();
+      formDataToSend.append("firstName", formData.firstName);
+      formDataToSend.append("lastName", formData.lastName);
+      formDataToSend.append("phoneNumber", formData.phoneNumber);
+      formDataToSend.append("email", formData.email);
+      formDataToSend.append("url", formData.url);
+      if (resume) {
+        formDataToSend.append("resume", resume);
+      }
+      console.log(" this is the form data : ");
+      console.log("firstname :" , formData.firstName);
+      console.log("lastname :" , formData.lastName);
+      console.log("phoneNumber :" , formData.phoneNumber);
+      console.log("email :" , formData.email);
+      console.log("url :" , formData.url);
+      try {
+        await axios.post("https://script.google.com/macros/s/AKfycbzzZFQS9KgFZi-BdtlaDVuOMI1sd1ndWXMsFJhmeJgg6Skk_rtcxXF2Iml3RUhHwUP4/exec", formDataToSend, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        console.log("Data sent to the server");
+      } catch (error) {
+        console.error("Error sending data to the server", error);
+      }
+    }
+  };
+
+  const successMessage = () => {
+    return (
+      <div
+        className="success"
+        style={{
+          display: submitted ? "" : "none",
+        }}
+      >
+        <h3>Form is submitted!</h3>
+      </div>
+    );
+  };
+
+  const errorMessage = () => {
+    return (
+      <div
+        className="error"
+        style={{
+          display: error ? "" : "none",
+        }}
+      >
+        <h3>All fields are mandatory!</h3>
+        <ul>
+          {error &&
+            error.map((err, index) => <li key={index}>{err.message}</li>)}
+        </ul>
+      </div>
+    );
   };
 
   return (
     <div className="form-container inter-font">
       <h1>Submit Your Application</h1>
-      <form className="form-group">
+      <form className="form-group" onSubmit={handleSubmit}>
         <div className="entry">
           <label>Position Title</label>
           <input
@@ -41,7 +130,12 @@ function CareersForm() {
           >
             Please upload resume/CV
           </a>
-          <input type="file" id="resumeUpload" className="file-input" />
+          <input
+            type="file"
+            id="resumeUpload"
+            className="file-input"
+            onChange={handleFileChange}
+          />
         </div>
         <div className="entry">
           <label>First Name *</label>
@@ -117,11 +211,17 @@ function CareersForm() {
             onChange={handleChange}
           />
         </div>
+        <div className="button-container">
+          <button type="button" className="cancel-button">
+            Cancel
+          </button>
+          <button type="submit" className="submit-button">
+            Submit
+          </button>
+        </div>
       </form>
-      <div className="button-container">
-        <button type="button" className="cancel-button">Cancel</button>
-        <button type="submit" className="submit-button">Submit</button>
-      </div>
+      {successMessage()}
+      {errorMessage()}
     </div>
   );
 }
