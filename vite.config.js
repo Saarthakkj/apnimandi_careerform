@@ -1,6 +1,3 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-
 export default defineConfig({
   plugins: [react()],
   server: {
@@ -14,7 +11,7 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
-      external: 'zod', // Add this line to externalize the `zod` module
+      // external: 'zod' // Comment out or remove this line
     }
   }
 })
