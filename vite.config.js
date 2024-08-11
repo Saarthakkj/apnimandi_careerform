@@ -11,5 +11,10 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/api/, '')
       }
     }
+  },
+  build: {
+    rollupOptions: {
+      external: ['zod'], // Add this line to externalize the `zod` module
+    }
   }
 })
