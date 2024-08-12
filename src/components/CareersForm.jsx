@@ -67,17 +67,17 @@ function CareersForm() {
       console.log("url :", formData.url);
       try {
         await axios.post(
-          "https://script.google.com/macros/s/AKfycbzzZFQS9KgFZi-BdtlaDVuOMI1sd1ndWXMsFJhmeJgg6Skk_rtcxXF2Iml3RUhHwUP4/exec",
+          'http://localhost:3000/submit-form', // Change this to your backend endpoint
           formDataToSend,
           {
             headers: {
-              "Content-Type": "multipart/form-data",
+              'Content-Type': 'multipart/form-data',
             },
           }
         );
-        console.log("Data sent to the server");
+        console.log('Data sent to the server');
       } catch (error) {
-        console.error("Error sending data to the server", error);
+        console.error('Error sending data to the server', error);
       }
     }
   };
