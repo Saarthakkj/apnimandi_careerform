@@ -15,7 +15,7 @@ function App() {
         </nav>
       </header>
       <div className="banner-container">
-        <img src="/banner.png" alt="Apni Mandi Banner" className="banner" />
+        <img src="https://www.apnimandi.com/images/background/img2.png" alt="banner site" className="banner" />
       </div>
       <CareersForm />
       <div className="footer-container">
