@@ -10,6 +10,7 @@ const FormSchema = z.object({
   phoneNumber: z.string().min(1, "Phone Number is required"),
   email: z.string().email("Invalid email address"),
   url: z.string().url("Invalid URL").optional().or(z.literal("")),
+
 });
 
 function CareersForm() {
@@ -19,11 +20,14 @@ function CareersForm() {
     phoneNumber: "",
     email: "",
     url: "",
+    resume : null,
   });
 
   const [resume, setResume] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState(null);
+  // const [resumeFileName, setResumeFileName] = useState('Please upload resume/CV');
+
 
   const handleChange = (e) => {
     e.preventDefault();
@@ -37,7 +41,14 @@ function CareersForm() {
 
   const handleFileChange = (e) => {
     setResume(e.target.files[0]);
-  };
+    const file = e.target.files[0];
+    setFormData({
+      ...formData,
+      resume: file,
+    });
+    console.log("file anme is : ", file.name);
+    document.getElementsByClassName("upload-link")[0].innerHTML = file.name;
+    };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -133,6 +144,7 @@ function CareersForm() {
             onClick={(event) => {
               event.preventDefault();
               document.getElementById("resumeUpload").click();
+
             }}
           >
             Please upload resume/CV
