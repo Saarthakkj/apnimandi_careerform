@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { z } from "zod";
-import axios from "axios";
+import React, { useState } from 'react';
+import { z } from 'zod';
+import axios from 'axios';
 import "./CareersForm.css";
 
 // Define the Zod schema
