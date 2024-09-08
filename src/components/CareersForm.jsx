@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { z } from 'zod';
-import axios from 'axios';
 import "./CareersForm.css";
 
 // Define the Zod schema
@@ -76,20 +75,7 @@ function CareersForm() {
       console.log("phoneNumber :", formData.phoneNumber);
       console.log("email :", formData.email);
       console.log("url :", formData.url);
-      try {
-        await axios.post(
-          "https://script.google.com/macros/s/AKfycbzzZFQS9KgFZi-BdtlaDVuOMI1sd1ndWXMsFJhmeJgg6Skk_rtcxXF2Iml3RUhHwUP4/exec",
-          formDataToSend,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-        console.log("Data sent to the server");
-      } catch (error) {
-        console.error("Error sending data to the server", error);
-      }
+      
     }
   };
 
