@@ -1,10 +1,11 @@
-const express = require('express')
+import express from 'express'; // Import express
+import jwtsecret from '../config.js'; // Import jwtsecret
+import User from '../db.js'; // Import User model
+import checkAuthHeader from './middleware.js'; // Import the middleware
+
 const app = express();
 const port = 3000;
 const router = express.Router();
-const jwtsecret = require ('../config.js');
-const User = require('../db.js');
-const checkAuthHeader = require('./middleware'); // Import the middleware
 
 function generateaccesstoken (uid){
   return jwt.sign(uid, jwtsecret);
