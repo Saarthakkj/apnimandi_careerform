@@ -1,65 +1,91 @@
 import cors from 'cors';
-// import {GoogleAuth} from 'google-auth-library';
-// import {google} from 'googleapis';
 import express from 'express';
-import bodyParser from 'body-parser';
+import multer from 'multer';
+import mongoose from 'mongoose';
 
+const url = 'mongodb+srv://prakhar22361:jLM42gDicITQ4VYj@cluster0.knqly.mongodb.net/';
+const dbName = 'apniMandi';
 const app = express();
-var row = 2;
-
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        // Define different destinations based on the file field name
+        if (file.fieldname === 'resume') {
+            cb(null, 'public/uploads/resumes/'); // Destination for resumes
+        } else {
+            cb(null, 'public/uploads/documents/'); // Destination for additional documents
+        }
+    },
+    filename: (req, file, cb) => {
+        cb(null, file.originalname); // Use the original file name
+    }
+})
+const upload = multer({ storage: storage });
 app.use(cors({
     origin: 'http://localhost:5173',
     methods: ['POST'], 
     credentials: true,
 }))
-app.use(express.json());
-// app.use(bodyParser.urlencoded({ extended: true }));
 
-// async function batchUpdateValues(spreadsheetId, range, valueInputOption, values) {
-//   const auth = new GoogleAuth({
-//     scopes: 'https://www.googleapis.com/auth/spreadsheets',
-//   });
+mongoose.connect(url + dbName).then(()=>console.log("mongoDB Connected")).catch(err=>console.log("MONGOOSE ERROR: ", err));
+const userSchema = new mongoose.Schema({
+    position_title: {
+        type: String,
+        required: true,
+    },
+    firstName: {
+        type: String,
+        required: true,
+    },
+    lastName: {
+        type: String,
+        required: true,
+    },
+    phoneNumber: {
+        type: String,
+        required: true,
+    },
+    email: {
+        type: String,
+        required: true,
+        // unique: true,
+    },
+    url: {
+        type: String,
+        required: true,
+    },
+    resume: {
+        type: String,
+        required: false
+    },
+    additional_documents: {
+        type: String,
+        required: false
+    }
+}, {timestamps: true});
+const user = mongoose.model('apnimandis', userSchema);
+app.use(express.json());    
+app.use(express.urlencoded({ extended: true }));
+app.use(upload.fields([{ name: 'resume' }, { name: 'additional_documents' }]));
 
-//   console.log("hello-------------");
 
-//   const service = google.sheets({version: 'v4', auth});
-// //   let values = [
-// //     [
-// //     ],
-// //   ];
-//   const data = [
-//     {
-//       range,
-//       values,
-//     },
-//   ];
-//   // Additional ranges to update ...
-//   const resource = {
-//     data,
-//     valueInputOption,
-//   };
+app.post("/addToSpreadsheet" ,async (req, res)=>{
+    console.log("this is the console output for body: ", req.body);
+    console.log("this is the console output for files: ", req.files);
+    const document = {
+        position_title: req.body.position_title,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        phoneNumber: req.body.phoneNumber,
+        email: req.body.email,
+        url: req.body.url,
+        resume: req.files['resume'] ? req.files['resume'][0].path : null,
+        additional_documents: req.files['additional_documents'] ? req.files['additional_documents'][0].path : null,
+    };
 
-//   try {
-//     const result = await service.spreadsheets.values.batchUpdate({
-//       spreadsheetId,
-//       resource,
-//     });
-//     console.log('%d cells updated.', result.data.totalUpdatedCells);
-//     return result;
-//   } catch (err) {
-//     // TODO (developer) - Handle exception
-//     throw err;
-//   }
-// }
+    const result = await user.create(document);
+    console.log(`Inserted document with id: ${result.insertedId}`);
+    res.send(`Document inserted with id: ${result.insertedId}`);
 
-
-app.post("/addToSpreadsheet", (req, res)=>{
-    // values = [req.];
-    // console.log("this is the console output: ", req.body);
-    const json = req.body;
-    // const values = [json.position_title, json.firstName, json.lastName, json.phoneNumber, json.email, json.url, json.resume, json.additional_documents]
-    // batchUpdateValues('1R69SkrNUGmTZCO6Oq6GtoPrdyP8t9bRRdPrO8M_sX2s', `Sheet1!A${row}:H${row}`, 'USER_ENTERED', values);
-    row=row+1;
 });
 
 app.listen(3001, ()=>{

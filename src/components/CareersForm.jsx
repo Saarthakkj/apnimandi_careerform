@@ -43,7 +43,7 @@ function CareersForm() {
 
   const handleFileChange1 = (e) => {
     setResume(e.target.files[0]);
-    const file = e.target.files[0];  <option value="" disabled>Select a position</option>
+    const file = e.target.files[0]; 
     setFormData({
       ...formData,
       resume: file,
@@ -90,8 +90,12 @@ function CareersForm() {
       console.log("email :", formData.email);
       console.log("url :", formData.url);
       console.log("form data :", formData);
-
-      const response = await axios.post("http://localhost:3001/addToSpreadsheet", formData);
+      const response = await axios.post("http://localhost:3001/addToSpreadsheet", formData, {
+        headers: {
+          'content-Type': 'multipart/form-data',
+        },
+      });
+      console.log("response ", response);
     }
   };
 
