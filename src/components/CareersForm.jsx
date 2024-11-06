@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { z } from 'zod';
 import "./CareersForm.css";
-import axios from 'axios';
+// import axios from 'axios';
+import emailjs from 'emailjs-com';
 
 // Define the Zod schema
 const FormSchema = z.object({
@@ -48,6 +49,16 @@ function CareersForm() {
       ...formData,
       resume: file,
     });
+    // const reader = new FileReader();
+    // reader.onload = function(event) {
+    //   const base64String = event.target.result;
+    //   setFormData({
+    //     ...formData,
+    //     resume: event.target.result,
+    //   });
+    //   console.log("resume" + base64String); // This will print the Base64 string
+    // };
+    // reader.readAsDataURL(file);
     console.log("file anme is : ", file.name);
     document.getElementById("upload-link1").innerHTML = file.name;
   };
@@ -59,6 +70,16 @@ function CareersForm() {
       ...formData,
       additional_documents: file,
     });
+    // const reader = new FileReader();
+    // reader.onload = function(event) {
+    //   const base64String = event.target.result;
+    //   setFormData({
+    //     ...formData,
+    //     additional_documents: event.target.result,
+    //   });
+    //   console.log("additional_documents" + base64String); // This will print the Base64 string
+    // };
+    // reader.readAsDataURL(file);
     console.log("file anme is : ", file.name);
     document.getElementById("upload-link2").innerHTML = file.name;
   };
@@ -90,12 +111,32 @@ function CareersForm() {
       console.log("email :", formData.email);
       console.log("url :", formData.url);
       console.log("form data :", formData);
-      const response = await axios.post("http://localhost:3001/addToSpreadsheet", formData, {
-        headers: {
-          'content-Type': 'multipart/form-data',
-        },
+      // const response = await axios.post("http://localhost:3001/addToSpreadsheet", formData, {
+      //   headers: {
+      //     'content-Type': 'multipart/form-data',
+      //   },
+      // });
+      // console.log("response ", response);
+
+      const plainData = {
+        'position_title' : formData.position_title,
+        'firstname' : formData.firstName,
+        "lastname" : formData.lastName,
+        "phoneNumber" : formData.phoneNumber,
+        "email" : formData.email,
+        "url" : formData.url,
+        "resume": formData.resume,
+        "additional_documents": formData.additional_documents
+      };
+
+      emailjs.send('service_orlaglr', 'template_vzzakgz', plainData, 'XxB1-e6fvcQiu0SXP')
+      .then( result => {
+      console.log("email sent: ", result);
+      // res.send(`Document send thru to email prakhar22361@iiitd.ac.in `, result);
+      })
+      .catch(err => {
+        console.log("this is the error:", err);
       });
-      console.log("response ", response);
     }
   };
 
@@ -152,7 +193,6 @@ function CareersForm() {
             onClick={(event) => {
               event.preventDefault();
               document.getElementById("resumeUpload").click();
-
             }}
           >
             Please upload resume/CV
@@ -493,6 +533,9 @@ function CareersForm() {
             Submit
           </button>
         </div>
+      </form>
+      <form id="formMy">
+        <></>
       </form>
       {successMessage()}
       {errorMessage()}
