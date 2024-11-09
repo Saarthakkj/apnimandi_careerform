@@ -1,11 +1,9 @@
-const express= require('express');
+import express from 'express'; // Import express
+import cors from 'cors'; // Import cors
+import  {userRouter}  from './user.js';
+
 const app = express();
-const cors = require('cors');
 const port = 3000;
-import  {userRouter}   from './user.js';
-
 const router = express.Router();
-
 router.get('/user' , userRouter);
-
 module.exports = router;

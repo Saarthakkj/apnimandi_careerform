@@ -1,7 +1,8 @@
-const express = require('express');
+import express from 'express'; // Import express
+import { jwtsecret } from './config.js'; // Import jwtsecret
+import jwt from 'jsonwebtoken'; // Import jsonwebtoken
+
 const app = express();
-const {jwtsecret} = require('./config.js');
-const jwt = require('jsonwebtoken');
 app.use(express.json());
 
 const checkAuthHeader = (req , res , next)=>{
@@ -22,7 +23,6 @@ const checkAuthHeader = (req , res , next)=>{
         console.log("added this in req username : " , req.username);
         next();
     })
-
 }
 
 module.exports = checkAuthHeader;

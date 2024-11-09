@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { z } from 'zod';
 import "./CareersForm.css";
+// import axios from 'axios';
+import emailjs from 'emailjs-com';
 
 // Define the Zod schema
 const FormSchema = z.object({
@@ -9,20 +11,22 @@ const FormSchema = z.object({
   phoneNumber: z.string().min(1, "Phone Number is required"),
   email: z.string().email("Invalid email address"),
   url: z.string().url("Invalid URL").optional().or(z.literal("")),
-
 });
 
 function CareersForm() {
   const [formData, setFormData] = useState({
+    position_title: "",
     firstName: "",
     lastName: "",
     phoneNumber: "",
     email: "",
     url: "",
     resume : null,
+    additional_documents : null,
   });
 
   const [resume, setResume] = useState(null);
+  const [additional_documents, setAdditional_documents] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState(null);
   // const [resumeFileName, setResumeFileName] = useState('Please upload resume/CV');
@@ -38,16 +42,56 @@ function CareersForm() {
     setSubmitted(false);
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange1 = (e) => {
     setResume(e.target.files[0]);
-    const file = e.target.files[0];
+    const file = e.target.files[0]; 
     setFormData({
       ...formData,
       resume: file,
     });
+    // const reader = new FileReader();
+    // reader.onload = function(event) {
+    //   const base64String = event.target.result;
+    //   setFormData({
+    //     ...formData,
+    //     resume: event.target.result,
+    //   });
+    //   console.log("resume" + base64String); // This will print the Base64 string
+    // };
+    // reader.readAsDataURL(file);
     console.log("file anme is : ", file.name);
-    document.getElementsByClassName("upload-link")[0].innerHTML = file.name;
-    };
+    document.getElementById("upload-link1").innerHTML = file.name;
+  };
+
+  const handleFileChange2 = (e) => {
+    setAdditional_documents(e.target.files[0]);
+    const file = e.target.files[0];
+    setFormData({
+      ...formData,
+      additional_documents: file,
+    });
+    // const reader = new FileReader();
+    // reader.onload = function(event) {
+    //   const base64String = event.target.result;
+    //   setFormData({
+    //     ...formData,
+    //     additional_documents: event.target.result,
+    //   });
+    //   console.log("additional_documents" + base64String); // This will print the Base64 string
+    // };
+    // reader.readAsDataURL(file);
+    console.log("file anme is : ", file.name);
+    document.getElementById("upload-link2").innerHTML = file.name;
+  };
+
+  const handleSelectChange = (e) => {
+    const { value } = e.target;
+    // console.log("----------------------", e.target);
+    setFormData({
+      ...formData,
+      position_title: value,
+    })
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -59,23 +103,40 @@ function CareersForm() {
       console.log("Form is submitted!");
       setError(null);
       setSubmitted(true);
-
-      const formDataToSend = new FormData();
-      formDataToSend.append("firstName", formData.firstName);
-      formDataToSend.append("lastName", formData.lastName);
-      formDataToSend.append("phoneNumber", formData.phoneNumber);
-      formDataToSend.append("email", formData.email);
-      formDataToSend.append("url", formData.url);
-      if (resume) {
-        formDataToSend.append("resume", resume);
-      }
       console.log(" this is the form data : ");
+      console.log("position_title :", formData.position_title);
       console.log("firstname :", formData.firstName);
       console.log("lastname :", formData.lastName);
       console.log("phoneNumber :", formData.phoneNumber);
       console.log("email :", formData.email);
       console.log("url :", formData.url);
-      
+      console.log("form data :", formData);
+      // const response = await axios.post("http://localhost:3001/addToSpreadsheet", formData, {
+      //   headers: {
+      //     'content-Type': 'multipart/form-data',
+      //   },
+      // });
+      // console.log("response ", response);
+
+      const plainData = {
+        'position_title' : formData.position_title,
+        'firstname' : formData.firstName,
+        "lastname" : formData.lastName,
+        "phoneNumber" : formData.phoneNumber,
+        "email" : formData.email,
+        "url" : formData.url,
+        "resume": formData.resume,
+        "additional_documents": formData.additional_documents
+      };
+
+      emailjs.send('service_orlaglr', 'template_vzzakgz', plainData, 'XxB1-e6fvcQiu0SXP')
+      .then( result => {
+      console.log("email sent: ", result);
+      // res.send(`Document send thru to email prakhar22361@iiitd.ac.in `, result);
+      })
+      .catch(err => {
+        console.log("this is the error:", err);
+      });
     }
   };
 
@@ -99,7 +160,7 @@ function CareersForm() {
         style={{
           display: error ? "" : "none",
         }}
-      >
+      >upload-link1
         <h3>All fields are mandatory!</h3>
         <ul>
           {error &&
@@ -115,11 +176,12 @@ function CareersForm() {
       <form className="form-group " onSubmit={handleSubmit}>
         <div className="entry">
           <h5>Position Title</h5>
-          <select className="job-roles">
-            <option value="swe">Software Engineer</option>
-            <option value="om">Operations Manager</option>
-            <option value="bd">Business Developer</option>
-            <option value="cm">Content Management</option>
+          <select className="job-roles" value = {formData.position_title} onChange={handleSelectChange}>
+            <option value="" disabled>Select a position</option>
+            <option value="Software Engineer">Software Engineer</option>
+            <option value="Operations Manager">Operations Manager</option>
+            <option value="Business Developer">Business Developer</option>
+            <option value="Content Management">Content Management</option>
           </select>
         </div>
         <div className="entry">
@@ -127,10 +189,10 @@ function CareersForm() {
           <a
             href="#"
             className="upload-link"
+            id = 'upload-link1'
             onClick={(event) => {
               event.preventDefault();
               document.getElementById("resumeUpload").click();
-
             }}
           >
             Please upload resume/CV
@@ -139,7 +201,7 @@ function CareersForm() {
             type="file"
             id="resumeUpload"
             className="file-input"
-            onChange={handleFileChange}
+            onChange={handleFileChange1}
           />
         </div>
         <div className="entry">
@@ -442,6 +504,7 @@ function CareersForm() {
           <a
             href="#"
             className="upload-link"
+            id = "upload-link2"
             onClick={(event) => {
               event.preventDefault();
               document.getElementById("documentUpload").click();
@@ -449,7 +512,7 @@ function CareersForm() {
           >
             Upload document(s)
           </a>
-          <input type="file" id="documentUpload" className="file-input" />
+          <input type="file" id="documentUpload" className="file-input" onChange={handleFileChange2}/>
         </div>
         <div className="entry">
           <h5>URL (LinkedIn, Github, Portfolio):</h5>
@@ -470,6 +533,9 @@ function CareersForm() {
             Submit
           </button>
         </div>
+      </form>
+      <form id="formMy">
+        <></>
       </form>
       {successMessage()}
       {errorMessage()}
